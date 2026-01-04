@@ -1,0 +1,258 @@
+import React, { useState } from 'react';
+import { Info, AlertTriangle, Shield, RefreshCcw, Heart, ArrowUp, Activity } from 'lucide-react';
+
+const BreakwellCurve = () => {
+  const [activePhase, setActivePhase] = useState(null);
+
+  const phases = [
+    {
+      id: 0,
+      title: "1. Auslösephase (Trigger)",
+      description: "Ein Ereignis oder ein Gedanke führt zu einem ersten Anstieg der Anspannung. Das Verhalten weicht leicht vom Normalzustand ab.",
+      signs: ["Unruhe", "Schnelles Sprechen", "Gereiztheit"],
+      actions: [
+        "Aktives Zuhören praktizieren",
+        "Empathie zeigen und Gefühle validieren",
+        "Bedürfnisse frühzeitig klären"
+      ],
+      color: "bg-blue-500",
+      stroke: "#3b82f6",
+      icon: <Info className="w-6 h-6" />,
+      cx: 100,
+      cy: 350
+    },
+    {
+      id: 1,
+      title: "2. Eskalationsphase",
+      description: "Die Emotionen gewinnen die Oberhand. Rationales Denken wird eingeschränkt. Die Körpersprache wird deutlich aggressiver.",
+      signs: ["Lautstärke steigt", "Drohende Gesten", "Tunnelblick"],
+      actions: [
+        "Ruhe bewahren (Stimme senken)",
+        "Distanz wahren (Schutzraum)",
+        "Wahlmöglichkeiten anbieten statt Befehle"
+      ],
+      color: "bg-yellow-500",
+      stroke: "#eab308",
+      icon: <Activity className="w-6 h-6" />,
+      cx: 250,
+      cy: 200
+    },
+    {
+      id: 2,
+      title: "3. Krise (Peak)",
+      description: "Der Kontrollverlust ist vollständig. Es besteht akute Gefahr durch körperliche oder massive verbale Gewalt.",
+      signs: ["Physischer Angriff", "Zerstörung", "Völliger Kontrollverlust"],
+      actions: [
+        "Eigenschutz hat oberste Priorität",
+        "Deeskalation durch Rückzug",
+        "Keine Diskussionen, nur klare Stopp-Signale"
+      ],
+      color: "bg-red-600",
+      stroke: "#dc2626",
+      icon: <Shield className="w-6 h-6" />,
+      cx: 400,
+      cy: 50
+    },
+    {
+      id: 3,
+      title: "4. Erholungsphase",
+      description: "Die Energie sinkt, aber das Adrenalin ist noch hoch. Achtung: Hohes Risiko für sofortige Re-Eskalation bei Provokation!",
+      signs: ["Schweres Atmen", "Zittern", "Langsames Nachlassen"],
+      actions: [
+        "Raum und Zeit geben",
+        "Reize minimieren (Licht/Lärm)",
+        "Präsenz zeigen, aber Distanz halten"
+      ],
+      color: "bg-orange-500",
+      stroke: "#f97316",
+      icon: <RefreshCcw className="w-6 h-6" />,
+      cx: 550,
+      cy: 250
+    },
+    {
+      id: 4,
+      title: "5. Depression (Post-Crisis)",
+      description: "Die Person fällt unter das normale Energieniveau. Gefühle von Scham, Schuld oder tiefer Erschöpfung dominieren.",
+      signs: ["Rückzug", "Weinen", "Schuldbewusstsein"],
+      actions: [
+        "Beziehungsarbeit und Versöhnung",
+        "Nachsorge-Gespräch (Debriefing)",
+        "Zukünftige Vermeidungsstrategien planen"
+      ],
+      color: "bg-purple-500",
+      stroke: "#a855f7",
+      icon: <Heart className="w-6 h-6" />,
+      cx: 750,
+      cy: 400
+    }
+  ];
+
+  return (
+    <div className="flex flex-col items-center p-4 min-h-screen bg-gray-50 text-slate-900 font-sans">
+      <div className="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        
+        {/* Header */}
+        <div className="bg-slate-900 p-8 text-white text-center">
+          <h1 className="text-3xl font-bold mb-2">Die Breakwell-Kurve</h1>
+          <p className="text-slate-400 max-w-2xl mx-auto">
+            Interaktives Modell der Aggressions-Eskalation. Bewege die Maus über die Kurve oder die Phasen-Buttons, um Handlungsvorschläge zu erhalten.
+          </p>
+        </div>
+
+        <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Chart Section */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="relative bg-slate-50 rounded-xl p-4 border border-slate-200 overflow-hidden">
+              <div className="absolute left-6 top-1/2 -rotate-90 text-xs font-bold text-slate-400 uppercase tracking-widest origin-left">
+                Aggressionslevel
+              </div>
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Zeitlicher Verlauf
+              </div>
+
+              <svg viewBox="0 0 850 500" className="w-full h-auto drop-shadow-sm">
+                {/* Axes */}
+                <line x1="60" y1="450" x2="820" y2="450" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
+                <line x1="60" y1="450" x2="60" y2="20" stroke="#cbd5e1" strokeWidth="2" markerEnd="url(#arrow)" />
+                
+                <defs>
+                  <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#cbd5e1" />
+                  </marker>
+                </defs>
+
+                {/* The Curve */}
+                <path
+                  d="M 60 400 Q 150 400, 250 200 T 400 50 Q 450 50, 550 250 T 800 450"
+                  fill="none"
+                  stroke="#e2e8f0"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+
+                {/* Animated Path Overlay for active phase */}
+                {activePhase !== null && (
+                   <path
+                   d="M 60 400 Q 150 400, 250 200 T 400 50 Q 450 50, 550 250 T 800 450"
+                   fill="none"
+                   stroke={phases[activePhase].stroke}
+                   strokeWidth="8"
+                   strokeLinecap="round"
+                   className="transition-all duration-500 ease-in-out opacity-20"
+                 />
+                )}
+
+                {/* Interactive Phase Points */}
+                {phases.map((phase) => (
+                  <g 
+                    key={phase.id} 
+                    className="cursor-pointer group"
+                    onMouseEnter={() => setActivePhase(phase.id)}
+                    onClick={() => setActivePhase(phase.id)}
+                  >
+                    <circle
+                      cx={phase.cx}
+                      cy={phase.cy}
+                      r={activePhase === phase.id ? "12" : "8"}
+                      fill={phase.stroke}
+                      className="transition-all duration-300 group-hover:r-12"
+                    />
+                    <circle
+                      cx={phase.cx}
+                      cy={phase.cy}
+                      r={activePhase === phase.id ? "24" : "0"}
+                      fill={phase.stroke}
+                      fillOpacity="0.2"
+                      className="transition-all duration-300"
+                    />
+                  </g>
+                ))}
+              </svg>
+            </div>
+
+            {/* Quick Access Buttons */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              {phases.map((phase) => (
+                <button
+                  key={phase.id}
+                  onMouseEnter={() => setActivePhase(phase.id)}
+                  className={`p-2 rounded-lg text-xs font-bold transition-all border ${
+                    activePhase === phase.id 
+                    ? `${phase.color} text-white border-transparent shadow-md scale-105` 
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  Phase {phase.id + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Details Sidebar */}
+          <div className="lg:col-span-1">
+            {activePhase !== null ? (
+              <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 h-full animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className={`w-12 h-12 rounded-full ${phases[activePhase].color} flex items-center justify-center text-white mb-4 shadow-lg`}>
+                  {phases[activePhase].icon}
+                </div>
+                <h2 className="text-xl font-bold mb-2 text-slate-800">{phases[activePhase].title}</h2>
+                <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+                  {phases[activePhase].description}
+                </p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-2 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" /> Anzeichen
+                    </h3>
+                    <ul className="space-y-1">
+                      {phases[activePhase].signs.map((sign, idx) => (
+                        <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
+                          <span className="text-slate-300 mt-1.5">•</span> {sign}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-200">
+                    <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-3 flex items-center gap-1">
+                      <ArrowUp className="w-3 h-3" /> Handlungsvorschläge
+                    </h3>
+                    <div className="space-y-3">
+                      {phases[activePhase].actions.map((action, idx) => (
+                        <div key={idx} className="bg-white p-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-800 shadow-sm">
+                          {action}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-50 rounded-xl p-8 border border-slate-200 border-dashed h-full flex flex-col items-center justify-center text-center text-slate-400">
+                <Activity className="w-12 h-12 mb-4 opacity-20" />
+                <p>Wähle eine Phase auf der Kurve aus, um Details zu sehen.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Info */}
+        <div className="bg-slate-50 border-t border-slate-200 p-6 flex flex-wrap gap-6 justify-center text-xs text-slate-500 italic">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-600"></div> Akute Gefahr
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div> Eskalationsrisiko
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-500"></div> Präventionsmöglichkeit
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BreakwellCurve;
