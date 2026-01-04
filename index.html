@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interaktive Breakwell-Kurve</title>
+    <!-- Tailwind CSS für das Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         .phase-transition {
@@ -30,9 +33,10 @@
             animation: fadeIn 0.4s ease-out forwards;
         }
 
-        .dot-active {
-            r: 12;
-            filter: drop-shadow(0 0 8px rgba(0,0,0,0.2));
+        /* Verhindert Flackern beim Laden der Icons */
+        [data-lucide] {
+            width: 1.5rem;
+            height: 1.5rem;
         }
     </style>
 </head>
@@ -55,10 +59,10 @@
                 <div class="lg:col-span-2 space-y-8">
                     <div class="relative bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-inner overflow-hidden">
                         <!-- Labels -->
-                        <div class="absolute left-4 top-1/2 -rotate-90 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] origin-left">
+                        <div class="absolute left-4 top-1/2 -rotate-90 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] origin-left select-none">
                             Aggressionslevel
                         </div>
-                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] select-none">
                             Zeitlicher Verlauf
                         </div>
 
@@ -83,7 +87,7 @@
                                 stroke-linecap="round"
                             />
 
-                            <!-- Highlight Path -->
+                            <!-- Highlight Path Overlay -->
                             <path id="highlight-curve"
                                 d="M 60 400 Q 150 400, 250 200 T 400 50 Q 450 50, 550 250 T 800 450"
                                 fill="none"
@@ -100,13 +104,13 @@
 
                     <!-- Quick Access Grid -->
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="buttons-container">
-                        <!-- Buttons will be injected here -->
+                        <!-- Buttons werden via JS eingefügt -->
                     </div>
                 </div>
 
                 <!-- Sidebar Details -->
                 <div class="lg:col-span-1">
-                    <div id="details-panel" class="bg-slate-50 rounded-2xl p-8 border border-slate-200 h-full flex flex-col items-center justify-center text-center">
+                    <div id="details-panel" class="bg-slate-50 rounded-2xl p-8 border border-slate-200 h-full flex flex-col items-center justify-center text-center transition-all duration-300">
                         <div class="opacity-20 mb-4">
                             <i data-lucide="activity" class="w-16 h-16"></i>
                         </div>
@@ -134,6 +138,7 @@
     </div>
 
     <script>
+        // Datenmodell der Phasen
         const phases = [
             {
                 id: 0,
@@ -222,18 +227,18 @@
             }
         ];
 
-        const detailsPanel = document.getElementById('details-panel');
-        const pointsContainer = document.getElementById('points-container');
-        const buttonsContainer = document.getElementById('buttons-container');
-        const highlightCurve = document.getElementById('highlight-curve');
-
+        // Zentrale Funktion zum Wechseln der Phasen
         function setActivePhase(id) {
             const phase = phases[id];
+            if (!phase) return;
             
-            // Update Curve Highlight
+            const highlightCurve = document.getElementById('highlight-curve');
+            const detailsPanel = document.getElementById('details-panel');
+
+            // Update Kurven-Highlight
             highlightCurve.setAttribute('stroke', phase.stroke);
 
-            // Update Points
+            // Update der SVG-Punkte
             document.querySelectorAll('.phase-dot').forEach((dot, index) => {
                 if(index === id) {
                     dot.setAttribute('r', '12');
@@ -244,7 +249,7 @@
                 }
             });
 
-            // Update Buttons
+            // Update der Buttons
             document.querySelectorAll('.phase-btn').forEach((btn, index) => {
                 if(index === id) {
                     btn.className = `phase-btn p-3 rounded-xl text-xs font-bold transition-all shadow-lg scale-105 border-transparent text-white ${phase.color}`;
@@ -253,7 +258,7 @@
                 }
             });
 
-            // Update Sidebar
+            // Update des Detail-Panels
             detailsPanel.innerHTML = `
                 <div class="animate-fade-in w-full text-left">
                     <div class="w-16 h-16 rounded-2xl ${phase.color} flex items-center justify-center text-white mb-6 shadow-xl">
@@ -293,31 +298,44 @@
                     </div>
                 </div>
             `;
-            lucide.createIcons();
+            
+            // Re-Initialisierung der Icons im dynamischen Content
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
-        // Initialize UI Elements
-        phases.forEach((phase, index) => {
-            // Points in SVG
-            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            g.innerHTML = `
-                <circle class="phase-dot cursor-pointer transition-all duration-300" 
-                    cx="${phase.cx}" cy="${phase.cy}" r="8" fill="${phase.stroke}" fill-opacity="0.6" />
-                <circle class="cursor-pointer" cx="${phase.cx}" cy="${phase.cy}" r="25" fill="transparent" 
-                    onmouseenter="setActivePhase(${index})" />
-            `;
-            pointsContainer.appendChild(g);
+        // Initialisierung sobald das DOM bereit ist
+        document.addEventListener('DOMContentLoaded', () => {
+            const pointsContainer = document.getElementById('points-container');
+            const buttonsContainer = document.getElementById('buttons-container');
 
-            // Buttons
-            const btn = document.createElement('button');
-            btn.className = `phase-btn p-3 rounded-xl text-xs font-bold transition-all border border-slate-200 bg-white text-slate-600 hover:bg-slate-50`;
-            btn.innerText = `Phase ${index + 1}`;
-            btn.onmouseenter = () => setActivePhase(index);
-            buttonsContainer.appendChild(btn);
+            phases.forEach((phase, index) => {
+                // Punkte im SVG erstellen
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                g.setAttribute('class', 'group');
+                g.innerHTML = `
+                    <circle class="phase-dot cursor-pointer transition-all duration-300" 
+                        cx="${phase.cx}" cy="${phase.cy}" r="8" fill="${phase.stroke}" fill-opacity="0.6" />
+                    <circle class="cursor-pointer" cx="${phase.cx}" cy="${phase.cy}" r="25" fill="transparent" 
+                        onmouseenter="setActivePhase(${index})" />
+                `;
+                pointsContainer.appendChild(g);
+
+                // Buttons erstellen
+                const btn = document.createElement('button');
+                btn.className = `phase-btn p-3 rounded-xl text-xs font-bold transition-all border border-slate-200 bg-white text-slate-600 hover:bg-slate-50`;
+                btn.innerText = `Phase ${index + 1}`;
+                btn.onmouseenter = () => setActivePhase(index);
+                btn.onclick = () => setActivePhase(index);
+                buttonsContainer.appendChild(btn);
+            });
+
+            // Initiale Icons laden
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         });
-
-        // Load Icons
-        lucide.createIcons();
     </script>
 </body>
 </html>
